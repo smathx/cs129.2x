@@ -35,17 +35,23 @@ Given /^the blog is set up$/ do
   Blog.default.update_attributes!({:blog_name => 'Teh Blag',
                                    :base_url => 'http://localhost:3000'});
   Blog.default.save!
-  User.create!({:login => 'admin',
-                :password => 'aaaaaaaa',
-                :email => 'joe@snow.com',
-                :profile_id => 1,
-                :name => 'admin',
-                :state => 'active'})
+  
+  # Create acount for each user type.
+  # Profile.select(:label).map { |x| x.label } gets the type names.
+  
+  ['admin', 'publisher', 'contributor'].each do |user|
+    User.create!({:login => "#{user}",
+                  :password => 'aaaaaaaa',
+                  :email => "#{user}@snow.com",
+                  :profile_id => Profile.find_by_label("#{user}").id,
+                  :name => "#{user}",
+                  :state => 'active'})
+  end
 end
 
-And /^I am logged into the admin panel$/ do
+And /^I am logged in ?to the (admin|publisher|contributor) panel$/ do |user|
   visit '/accounts/login'
-  fill_in 'user_login', :with => 'admin'
+  fill_in 'user_login', :with => "#{user}"
   fill_in 'user_password', :with => 'aaaaaaaa'
   click_button 'Login'
   if page.respond_to? :should

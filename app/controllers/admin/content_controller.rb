@@ -34,6 +34,7 @@ class Admin::ContentController < Admin::BaseController
       flash[:error] = _("Error, you are not allowed to perform this action")
       return
     end
+    @allowed_to_merge_articles = current_user.admin?
     new_or_edit
   end
 
@@ -239,5 +240,38 @@ class Admin::ContentController < Admin::BaseController
 
   def setup_resources
     @resources = Resource.by_created_at
+  end
+  
+  # Code for merge added here.
+  
+  # /admin/content/merge ends up here.
+  public 
+  
+  def merge
+    article_id = params[:article_id]
+    merge_with_id = params[:merge_with]
+    if merge_with_id.nil? or (merge_with_id =~ /^ *[0-9]+ *$/).nil?
+      redirect_to :action => 'edit', :id => article_id
+      flash[:error] = "The merge article ID must be an integer"
+      return
+    end
+        
+    if article_id == merge_with_id
+      redirect_to :action => 'edit', :id => article_id
+      flash[:error] = "Articles cannot be merged with themselves"
+      return
+    end      
+
+    article = Article.find_by_id(article_id)
+    merged_article = article.merge_with(merge_with_id)
+    
+    if merged_article.nil?
+      redirect_to :action => 'edit', :id => article_id
+      flash[:error] = "Failed to merge articles #{article_id} and #{merge_with_id}"
+      return
+    end
+
+    redirect_to :action => 'admin/content'
+    flash[:notice] = "Articles #{article_id} and #{merge_with_id} merged successfully"
   end
 end

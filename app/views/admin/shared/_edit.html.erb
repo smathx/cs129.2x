@@ -2,5 +2,23 @@
 <%= form_tag(form_action, :id => "#{form_type}_form", :enctype => "multipart/form-data", :class => className) do %>
 
   <%= render :partial => "form" %>
+  
+<% end %>
 
+<!-- Put merge form after everything else -->
+
+<% if @allowed_to_merge_articles %>
+  <div>
+    <%= form_tag("/admin/content/merge") do %>
+    	<h4>Merge Articles</h4>
+      <div class="clearfix">
+      	<label for="merge_with">Article ID</label>
+      	<div class="input">
+          <input id="merge_with" name="merge_with" type="text" class="span5">
+        </div>
+      </div>
+      <%= hidden_field_tag('article_id', @article.id) %>
+      <input name="commit" type="submit" value="Merge" class="btn">
+    <% end %>
+  </div>
 <% end %>

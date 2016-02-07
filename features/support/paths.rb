@@ -24,6 +24,12 @@ module NavigationHelpers
       
     when /^the edit page for "([^\"]+)"$/
       "/admin/content/edit/#{ Article.find_by_title($1).id }"
+    when /^the view page for "([^\"]+)"$/
+      "/admin/content/edit/#{ Article.find_by_title($1).id }"
+    
+    #Does not work on Cloud9??
+    #  Article.find_by_title($1).permalink_url
+    #  "/previews/#{ Article.find_by_title($1).id }"
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

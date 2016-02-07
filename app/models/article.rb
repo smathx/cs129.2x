@@ -466,4 +466,27 @@ class Article < Content
     to = to - 1 # pull off 1 second so we don't overlap onto the next day
     return from..to
   end
+  
+  # Merge code goes here
+  
+  public
+  
+  def merge_with(other_article_id)
+    other_article = Article.find_by_id(other_article_id)
+    if other_article.nil?
+      return nil
+    end
+    
+    self.update_attributes(:body => "#{self.body}\n#{other_article.body}")
+    
+    other_article.comments.each do |comment|
+      comment.update_attributes(:article_id => self.id)
+    end
+
+    # Reload otherwise destroy may wipe out exising comments.
+    other_article.reload
+    other_article.destroy
+    
+    self
+  end
 end
